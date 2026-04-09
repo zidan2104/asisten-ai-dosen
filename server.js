@@ -65,6 +65,10 @@ function writeLogs(data) {
 // ─── Single-device session tracker ───────────────────────────────────────────
 const activeSessions = {};
 
+// ─── Heartbeat tracker (username -> timestamp ms terakhir ping) ───────────────
+const heartbeatTimes = {};
+const HEARTBEAT_TIMEOUT = 60 * 1000; // anggap offline jika > 60 detik tanpa ping
+
 // ─── SSE sound event clients ──────────────────────────────────────────────────
 const sseClients = {}; // username -> res
 
@@ -237,16 +241,33 @@ app.post('/api/login', loginLimiter, async (req, res) => {
   req.session.user = username;
   req.session.role = user.role;
   activeSessions[username] = req.sessionID;
+  heartbeatTimes[username] = Date.now(); // catat waktu login sebagai heartbeat awal
 
   const redirect = user.role === 'dosen' ? '/admin' : '/chat';
   res.json({ redirect });
 });
 
 app.post('/api/logout', (req, res) => {
-  if (req.session.user) delete activeSessions[req.session.user];
+  if (req.session.user) {
+    delete activeSessions[req.session.user];
+    delete heartbeatTimes[req.session.user];
+  }
   req.session.destroy(() => {
     res.json({ message: 'Logout berhasil' });
   });
+});
+
+// ─── Heartbeat (client ping setiap 30 detik untuk mempertahankan status Online) ─
+app.post('/api/heartbeat', requireAuth, (req, res) => {
+  heartbeatTimes[req.session.user] = Date.now();
+  res.json({ ok: true });
+});
+
+// ─── Beacon (dikirim via sendBeacon saat tab/browser ditutup) ─────────────────
+app.post('/api/beacon', requireAuth, (req, res) => {
+  delete activeSessions[req.session.user];
+  delete heartbeatTimes[req.session.user];
+  res.status(204).end();
 });
 
 // ─── Page routes ──────────────────────────────────────────────────────────────
@@ -555,11 +576,17 @@ app.delete('/api/logs', requireAuth, requireDosen, (req, res) => {
 app.get('/api/status', requireAuth, requireDosen, (req, res) => {
   const db = readDB();
   const mhsList = db.users.filter(u => u.role === 'mhs');
-  const result = mhsList.map(u => ({
-    username: u.username,
-    classId:  u.classId,
-    status:   activeSessions[u.username] ? 'Online' : 'Offline'
-  }));
+  const now = Date.now();
+  const result = mhsList.map(u => {
+    const hasSession  = !!activeSessions[u.username];
+    const lastBeat    = heartbeatTimes[u.username];
+    const recentBeat  = lastBeat && (now - lastBeat) < HEARTBEAT_TIMEOUT;
+    return {
+      username: u.username,
+      classId:  u.classId,
+      status:   (hasSession && recentBeat) ? 'Online' : 'Offline'
+    };
+  });
   res.json(result);
 });
 

@@ -460,6 +460,18 @@
   // Poll setiap 6 detik — kalau kelas dinonaktifkan, langsung redirect
   setInterval(checkAccess, 6000);
 
+  // ── Heartbeat: beri tahu server bahwa user masih aktif setiap 30 detik ───────
+  function sendHeartbeat() {
+    fetch('/api/heartbeat', { method: 'POST' }).catch(() => {});
+  }
+  sendHeartbeat();
+  setInterval(sendHeartbeat, 30000);
+
+  // ── Beacon: otomatis logout dari activeSessions saat tab/browser ditutup ─────
+  window.addEventListener('pagehide', () => {
+    navigator.sendBeacon('/api/beacon');
+  });
+
   let messages = [];
   let isLoading = false;
   let welcomeData = null; // cache config welcome

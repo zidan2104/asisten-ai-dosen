@@ -1424,6 +1424,14 @@
       }
     });
 
+    // ── Heartbeat & Beacon ────────────────────────────────────────────────────────
+    function sendHeartbeat() {
+      fetch('/api/heartbeat', { method: 'POST' }).catch(() => {});
+    }
+    sendHeartbeat();
+    setInterval(sendHeartbeat, 30000);
+    window.addEventListener('pagehide', () => { navigator.sendBeacon('/api/beacon'); });
+
     // ── Logout ───────────────────────────────────────────────────────────────────
     $('btnLogout').addEventListener('click', async () => {
       if (isDirty) {
