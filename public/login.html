@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantumBot — Login</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #13131c;
+      --border:    #1e1e2e;
+      --accent:    #2596be;
+      --accent-dim:#1d7a99;
+      --text:      #e2e2f0;
+      --muted:     #6b6b8a;
+      --error:     #ff6b6b;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* subtle radial glow behind card */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(37,150,190,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px 36px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-icon {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      color: #2596be;
+      text-shadow: 0 0 8px rgba(37, 150, 190, 0.8);
+    }
+
+    .logo p {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,150,190,.18);
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      background: #2596be;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color .2s, box-shadow .2s, transform .1s;
+      box-shadow: 0 6px 20px rgba(37,150,190,.3);
+    }
+
+    button[type="submit"]:hover  { background-color: #2ea9d6; box-shadow: 0 0 8px #2596be; }
+    button[type="submit"]:active { transform: scale(.98); }
+
+    button[type="submit"]:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(255,107,107,.1);
+      border: 1px solid rgba(255,107,107,.35);
+      color: var(--error);
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: .88rem;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .error-msg.visible { display: block; }
+
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon"><img src="/logobaru.svg" alt="QuantumBot" style="max-width:100%;max-height:200px;/* ← ganti angka ini untuk ubah ukuran logo */object-fit:contain;display:block;"></div>
+      <h1>QuantumBot</h1>
+      <p>Asisten Microcontroller &amp; Elektronika</p>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text"
+               placeholder="Masukkan username" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password"
+               placeholder="Masukkan password" autocomplete="current-password" required />
+      </div>
+
+      <button type="submit" id="submitBtn">
+        <span id="btnText">Masuk</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+
+      <div class="error-msg" id="errorMsg"></div>
+    </form>
+  </div>
+
+  <script>
+    const form      = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText   = document.getElementById('btnText');
+    const spinner   = document.getElementById('spinner');
+    const errorMsg  = document.getElementById('errorMsg');
+
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      btnText.style.display  = on ? 'none' : 'inline';
+      spinner.style.display  = on ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('visible');
+    }
+
+    function clearError() {
+      errorMsg.classList.remove('visible');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        showError('Username dan password wajib diisi.');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || 'Login gagal. Coba lagi.');
+          return;
+        }
+
+        // Redirect sesuai role yang dikembalikan server
+        window.location.href = data.redirect;
+
+      } catch (err) {
+        showError('Tidak dapat terhubung ke server. Periksa koneksi Anda.');
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>

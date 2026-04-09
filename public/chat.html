@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="img-src * data: 'unsafe-eval' 'unsafe-inline';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZidanBot · Microcontroller Assistant</title>
+  <title>QuantumBot · Microcontroller Assistant</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,8 +14,8 @@
       --surface: #111118;
       --surface2: #1a1a26;
       --border: #2a2a3d;
-      --accent: #7c6bff;
-      --accent2: #ff6b9d;
+      --accent: #2596be;
+      --accent2: #2ea9d6;
       --text: #e8e8f0;
       --muted: #6b6b8a;
     }
@@ -34,8 +35,8 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(124,107,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,107,255,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(37,150,190,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,150,190,0.03) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -46,7 +47,7 @@
       position: fixed;
       top: -200px; right: -200px;
       width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(124,107,255,0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(37,150,190,0.12) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
       animation: orbFloat 8s ease-in-out infinite;
@@ -72,16 +73,14 @@
     .logo { display: flex; align-items: center; gap: 10px; }
 
     .logo-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      width: 40px; height: 40px;  /* ← ukuran logo di navbar chat */
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 0 20px rgba(124,107,255,0.4);
+      flex-shrink: 0;
     }
+    .logo-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
     .logo-text { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-    .logo-text span { color: var(--accent); }
+    .logo-text span { color: var(--accent); text-shadow: 0 0 8px rgba(37, 150, 190, 0.8); }
 
     .model-badge {
       font-family: 'JetBrains Mono', monospace;
@@ -115,6 +114,7 @@
       gap: 16px;
       position: relative;
       z-index: 1;
+      background: rgba(10, 10, 15, 0.8);
     }
 
     #chat-area::-webkit-scrollbar { width: 4px; }
@@ -127,24 +127,30 @@
       text-align: center;
       gap: 16px; padding: 40px;
       animation: fadeIn 0.6s ease;
+      position: relative; z-index: 10;
     }
 
     .welcome-orb {
-      width: 80px; height: 80px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      width: 100px; height: 100px;  /* ← ukuran logo di welcome screen chat */
       display: flex; align-items: center; justify-content: center;
-      font-size: 36px;
-      box-shadow: 0 0 40px rgba(124,107,255,0.3);
       animation: pulse 3s ease-in-out infinite;
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .welcome-orb img {
+      width: 100%; height: 100%; object-fit: contain; display: block;
+      background: transparent !important;
+      background-color: transparent !important;
     }
 
     @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 40px rgba(124,107,255,0.3); }
-      50% { box-shadow: 0 0 60px rgba(124,107,255,0.5); }
+      0%, 100% { box-shadow: 0 0 40px rgba(37,150,190,0.3); }
+      50% { box-shadow: 0 0 60px rgba(37,150,190,0.5); }
     }
 
-    #welcome h1 { font-size: 28px; font-weight: 800; }
+    #welcome h1 { font-size: 28px; font-weight: 800; color: #2596be; text-shadow: 0 0 8px rgba(37, 150, 190, 0.8); }
     #welcome p { color: var(--muted); font-size: 15px; max-width: 320px; line-height: 1.6; }
 
     .suggestions {
@@ -162,6 +168,7 @@
       cursor: pointer;
       transition: all 0.2s;
       background: var(--surface);
+      position: relative; z-index: 10;
     }
 
     .suggestion-chip:hover {
@@ -227,7 +234,7 @@
     .bubble code {
       font-family: 'JetBrains Mono', monospace;
       font-size: 12.5px;
-      background: rgba(124,107,255,0.1);
+      background: rgba(37,150,190,0.1);
       padding: 2px 6px;
       border-radius: 4px;
       color: var(--accent);
@@ -308,7 +315,7 @@
 
     .input-wrapper:focus-within {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(124,107,255,0.1);
+      box-shadow: 0 0 0 3px rgba(37,150,190,0.1);
     }
 
     #user-input {
@@ -328,16 +335,16 @@
     #send-btn {
       width: 40px; height: 40px;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      background: #2596be;
       border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      transition: opacity 0.2s, transform 0.1s;
+      transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
     }
 
-    #send-btn:hover { opacity: 0.85; transform: scale(1.05); }
+    #send-btn:hover { background-color: #2ea9d6; box-shadow: 0 0 8px #2596be; transform: scale(1.05); }
     #send-btn:active { transform: scale(0.95); }
-    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
     #send-btn svg { width: 18px; height: 18px; fill: white; }
 
     .input-footer {
@@ -382,6 +389,7 @@
   </style>
 </head>
 <body>
+<canvas id="tron-bg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.5;"></canvas>
 
 <!-- 🔊 Audio embed langsung sebagai base64 (tidak perlu file eksternal) -->
 <audio id="img-sfx" preload="auto">
@@ -390,26 +398,28 @@
 
 <header>
   <div class="logo">
-    <div class="logo-icon">⚡</div>
-    <div class="logo-text">Zidan<span>Bot</span></div>
+    <div class="logo-icon"><img src="/logobaru.svg" alt="QuantumBot" style="width:100%;height:100%;object-fit:contain;display:block;"></div>
+    <div class="logo-text">Quantum<span>Bot</span></div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div class="status-dot" title="Server aktif"></div>
-    <span class="model-badge">Microcontroller AI</span>
+    <span class="model-badge">Dosen AI Assistant</span>
+    <a id="downloadBtn" href="#" target="_blank" class="download-btn" style="display: none; text-decoration: none; background: var(--accent); color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; margin-left: auto; align-items: center; gap: 5px;">Download Material</a>
     <button onclick="clearChat()" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Syne',sans-serif;">🗑 Reset</button>
+    <button id="btnLogout" style="font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Syne',sans-serif;transition:border-color .2s,color .2s;" onmouseover="this.style.borderColor='#ff6b6b';this.style.color='#ff6b6b'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⏻ Logout</button>
   </div>
 </header>
 
 <div id="chat-area">
   <div id="welcome">
-    <div class="welcome-orb">⚡</div>
-    <h1>Halo! Saya ZidanBot</h1>
+    <div class="welcome-orb"><img src="/logobaru.png" alt="QuantumBot" style="mix-blend-mode: lighten; width: 100%; object-fit: contain;"></div>
+    <h1>Halo! Saya QuantumBot</h1>
     <p>Asisten khusus microcontroller. Tanya seputar Arduino, ESP32, sensor, dan elektronika!</p>
     <div class="suggestions">
-      <div class="suggestion-chip" onclick="sendSuggestion('Cara blink LED dengan Arduino')">💡 Blink LED Arduino</div>
-      <div class="suggestion-chip" onclick="sendSuggestion('Tampilkan pinout Arduino Uno')">📌 Pinout Arduino</div>
-      <div class="suggestion-chip" onclick="sendSuggestion('Cara koneksi ESP32 ke WiFi')">📶 ESP32 WiFi</div>
-      <div class="suggestion-chip" onclick="sendSuggestion('Cara pakai sensor DHT22 dengan Arduino')">🌡️ Sensor DHT22</div>
+      <div class="suggestion-chip" data-text="Cara blink LED dengan Arduino" onclick="sendSuggestion(this.dataset.text)">💡 Blink LED Arduino</div>
+      <div class="suggestion-chip" data-text="Tampilkan pinout Arduino Uno" onclick="sendSuggestion(this.dataset.text)">📌 Pinout Arduino</div>
+      <div class="suggestion-chip" data-text="Cara koneksi ESP32 ke WiFi" onclick="sendSuggestion(this.dataset.text)">📶 ESP32 WiFi</div>
+      <div class="suggestion-chip" data-text="Cara pakai sensor DHT22 dengan Arduino" onclick="sendSuggestion(this.dataset.text)">🌡️ Sensor DHT22</div>
     </div>
   </div>
 </div>
@@ -430,8 +440,73 @@
 <div id="error-toast"></div>
 
 <script>
+  // ── Auth guard: redirect ke login jika sesi tidak valid / kelas ditutup ──────
+  async function checkAccess() {
+    try {
+      const r = await fetch('/api/me');
+      if (r.status === 401) {
+        window.location.replace('/login.html');
+        return;
+      }
+      if (r.status === 403) {
+        // Kelas dinonaktifkan oleh dosen — tampilkan notif lalu redirect
+        showError('Akses kelas ditutup oleh Dosen. Kamu akan dialihkan ke halaman login…');
+        setTimeout(() => window.location.replace('/login.html'), 2500);
+      }
+    } catch { window.location.replace('/login.html'); }
+  }
+
+  checkAccess();
+  // Poll setiap 6 detik — kalau kelas dinonaktifkan, langsung redirect
+  setInterval(checkAccess, 6000);
+
   let messages = [];
   let isLoading = false;
+  let welcomeData = null; // cache config welcome
+
+  // ── Load welcome screen dinamis ───────────────────────────────────────────────
+  async function loadWelcome() {
+    try {
+      const res = await fetch('/api/welcome');
+      if (res.ok) {
+        welcomeData = await res.json();
+        if (welcomeData.driveLink && welcomeData.driveLink.trim()) {
+          const btn = document.getElementById('downloadBtn');
+          btn.href = welcomeData.driveLink.trim();
+          btn.style.display = 'inline-flex';
+        }
+      }
+    } catch (_) {}
+    renderWelcome();
+  }
+
+  function renderWelcome() {
+    const d = welcomeData || {};
+    const title = d.welcomeTitle || 'Halo! Saya QuantumBot';
+    const desc  = d.welcomeDesc  || 'Asisten khusus microcontroller. Tanya seputar Arduino, ESP32, sensor, dan elektronika!';
+    const sugs  = (d.suggestions && d.suggestions.length)
+      ? d.suggestions
+      : ['Cara blink LED dengan Arduino', 'Tampilkan pinout Arduino Uno', 'Cara koneksi ESP32 ke WiFi', 'Cara pakai sensor DHT22 dengan Arduino'];
+
+    const chipsHtml = sugs.map(s =>
+      `<div class="suggestion-chip" data-text="${s.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="sendSuggestion(this.dataset.text)">${s}</div>`
+    ).join('');
+
+    const el = document.getElementById('welcome');
+    if (el) {
+      el.querySelector('h1').textContent = title;
+      el.querySelector('p').textContent  = desc;
+      el.querySelector('.suggestions').innerHTML = chipsHtml;
+    }
+  }
+
+  loadWelcome();
+
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    try { await fetch('/api/logout', { method: 'POST' }); } finally {
+      window.location.href = '/login.html';
+    }
+  });
 
   function handleKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -544,12 +619,12 @@
   }
 
   function formatMessage(text) {
-    // ✅ FIX 1: Render gambar markdown dulu
-    text = text.replace(/!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g,
-      '<img src="$2" alt="$1" style="max-width:100%;border-radius:10px;margin:8px 0;border:1px solid var(--border);">');
+    // ✅ FIX 1: Render gambar markdown dulu (Tanpa onerror yang bikin bug)
+    text = text.replace(/!\[([^\]]*)\]\((.*?)\)/g,
+      '<img src="$2" alt="$1" referrerpolicy="no-referrer" style="max-width:100%;border-radius:10px;margin:8px 0;border:1px solid var(--border);display:block;">');
 
     // Render link markdown [text](url)
-    text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+    text = text.replace(/\[([^\]]+)\]\((.*?)\)/g,
       '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
     // Code blocks
@@ -589,16 +664,12 @@
     const chat = document.getElementById('chat-area');
     chat.innerHTML = `
       <div id="welcome">
-        <div class="welcome-orb">⚡</div>
-        <h1>Halo! Saya ZidanBot</h1>
-        <p>Asisten khusus microcontroller. Tanya seputar Arduino, ESP32, sensor, dan elektronika!</p>
-        <div class="suggestions">
-          <div class="suggestion-chip" onclick="sendSuggestion('Cara blink LED dengan Arduino')">💡 Blink LED Arduino</div>
-          <div class="suggestion-chip" onclick="sendSuggestion('Tampilkan pinout Arduino Uno')">📌 Pinout Arduino</div>
-          <div class="suggestion-chip" onclick="sendSuggestion('Cara koneksi ESP32 ke WiFi')">📶 ESP32 WiFi</div>
-          <div class="suggestion-chip" onclick="sendSuggestion('Cara pakai sensor DHT22 dengan Arduino')">🌡️ Sensor DHT22</div>
-        </div>
+        <div class="welcome-orb"><img src="/logobaru.png" alt="QuantumBot" style="mix-blend-mode: lighten; width: 100%; object-fit: contain;"></div>
+        <h1></h1>
+        <p></p>
+        <div class="suggestions"></div>
       </div>`;
+    renderWelcome();
   }
 
   function showError(msg) {
@@ -607,6 +678,184 @@
     toast.style.display = 'block';
     setTimeout(() => { toast.style.display = 'none'; }, 5000);
   }
+
+  // ── Sound event listener (SSE dari dosen) ───────────────────────────────────
+  // AudioContext dibuat sekali, di-unlock saat user pertama kali berinteraksi
+  let _audioCtx = null;
+
+  function getAudioCtx() {
+    if (!_audioCtx) {
+      _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return _audioCtx;
+  }
+
+  // Unlock AudioContext pada interaksi pertama user (klik atau ketik)
+  function unlockAudio() {
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+  }
+  document.addEventListener('click',   unlockAudio, { once: false });
+  document.addEventListener('keydown', unlockAudio, { once: false });
+  document.addEventListener('touchstart', unlockAudio, { once: false });
+
+  function playBeep() {
+    try {
+      const ctx = getAudioCtx();
+      // Resume dulu kalau masih suspended
+      const doPlay = () => {
+        const freqs = [880, 1100, 880];
+        let t = ctx.currentTime + 0.05;
+        freqs.forEach(freq => {
+          const osc  = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.5, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+          osc.start(t);
+          osc.stop(t + 0.3);
+          t += 0.33;
+        });
+      };
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(doPlay);
+      } else {
+        doPlay();
+      }
+    } catch (err) {
+      console.warn('playBeep error:', err);
+    }
+  }
+
+  (function connectSoundSSE() {
+    const es = new EventSource('/api/sound-events');
+    es.onmessage = e => { if (e.data === 'play') playBeep(); };
+    es.onerror = () => {
+      es.close();
+      setTimeout(connectSoundSSE, 5000);
+    };
+  })();
+</script>
+
+<script>
+  // ── Tron Digital Comets Animation ────────────────────────────────────────
+  (function() {
+    const canvas = document.getElementById('tron-bg');
+    const ctx    = canvas.getContext('2d');
+
+    const CELL       = 30;          // grid cell size in px
+    const TRON_COLOR = '#2596be';
+    const COMET_COUNT = 18;
+    const FADE_RATE   = 0.04;       // how fast lit cells fade per frame
+
+    let W, H, cols, rows;
+    let cells  = [];   // 2D array of alpha values [0..1]
+    let comets = [];
+
+    // Directions: right, down, left, up
+    const DIRS = [
+      { dx: 1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: -1, dy: 0 },
+      { dx: 0, dy: -1 },
+    ];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      cols  = Math.ceil(W / CELL) + 1;
+      rows  = Math.ceil(H / CELL) + 1;
+      cells = Array.from({ length: rows }, () => new Float32Array(cols));
+      comets = Array.from({ length: COMET_COUNT }, spawnComet);
+    }
+
+    function spawnComet() {
+      const dir = DIRS[Math.floor(Math.random() * DIRS.length)];
+      let col, row;
+      if (dir.dx === 1)  { col = 0;        row = Math.floor(Math.random() * rows); }
+      else if (dir.dx === -1) { col = cols - 1; row = Math.floor(Math.random() * rows); }
+      else if (dir.dy === 1)  { col = Math.floor(Math.random() * cols); row = 0; }
+      else                    { col = Math.floor(Math.random() * cols); row = rows - 1; }
+      return {
+        col: col + 0.0, row: row + 0.0,
+        dir,
+        speed: 0.06 + Math.random() * 0.10,
+        // fractional progress along current cell
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // ── 1. Draw static dim grid ──────────────────────────────────────────
+      ctx.strokeStyle = 'rgba(37,150,190,0.07)';
+      ctx.lineWidth   = 1;
+      ctx.shadowBlur  = 0;
+      for (let c = 0; c <= cols; c++) {
+        ctx.beginPath();
+        ctx.moveTo(c * CELL, 0);
+        ctx.lineTo(c * CELL, H);
+        ctx.stroke();
+      }
+      for (let r = 0; r <= rows; r++) {
+        ctx.beginPath();
+        ctx.moveTo(0, r * CELL);
+        ctx.lineTo(W, r * CELL);
+        ctx.stroke();
+      }
+
+      // ── 2. Draw lit & fading cells ───────────────────────────────────────
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const a = cells[r][c];
+          if (a < 0.01) continue;
+          ctx.fillStyle = `rgba(37,150,190,${a.toFixed(3)})`;
+          ctx.shadowBlur  = 8;
+          ctx.shadowColor = TRON_COLOR;
+          ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2);
+          cells[r][c] = Math.max(0, a - FADE_RATE);
+        }
+      }
+
+      // ── 3. Move comets & light cells ─────────────────────────────────────
+      ctx.shadowBlur  = 14;
+      ctx.shadowColor = TRON_COLOR;
+      for (let i = 0; i < comets.length; i++) {
+        const cm = comets[i];
+        cm.col += cm.dir.dx * cm.speed;
+        cm.row += cm.dir.dy * cm.speed;
+
+        const gc = Math.floor(cm.col);
+        const gr = Math.floor(cm.row);
+
+        // Light current cell fully
+        if (gr >= 0 && gr < rows && gc >= 0 && gc < cols) {
+          cells[gr][gc] = 1.0;
+          // Bright comet head
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(gc * CELL + 3, gr * CELL + 3, CELL - 6, CELL - 6);
+        }
+
+        // Respawn if out of bounds
+        if (cm.col < -1 || cm.col > cols + 1 || cm.row < -1 || cm.row > rows + 1) {
+          comets[i] = spawnComet();
+          // Occasionally change direction mid-journey (on grid nodes)
+          if (Math.random() < 0.3) {
+            comets[i].dir = DIRS[Math.floor(Math.random() * DIRS.length)];
+          }
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+  })();
 </script>
 </body>
 </html>

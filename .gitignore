@@ -1,2 +1,11 @@
 node_modules/
 .env
+
+# Data sensitif — jangan diupload ke GitHub
+database.json
+logs.json
+knowledge.txt
+uploads_meta.json
+
+# Claude Code internal
+.claude/
