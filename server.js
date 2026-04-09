@@ -120,12 +120,13 @@ function writeConfig(data) {
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-      styleSrc:   ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-      fontSrc:    ["'self'", "fonts.gstatic.com"],
-      imgSrc:     ["'self'", "data:", "https:", "lh3.googleusercontent.com"],
-      connectSrc: ["'self'"],
+      defaultSrc:    ["'self'"],
+      scriptSrc:     ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
+      scriptSrcAttr: ["'unsafe-inline'"], // izinkan onclick/onkeydown/oninput attribute di HTML
+      styleSrc:      ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
+      fontSrc:       ["'self'", "fonts.gstatic.com"],
+      imgSrc:        ["'self'", "data:", "https:", "lh3.googleusercontent.com"],
+      connectSrc:    ["'self'"],
     },
   },
   crossOriginEmbedderPolicy: false,
