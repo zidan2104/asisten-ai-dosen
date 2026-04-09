@@ -126,6 +126,7 @@ app.use(helmet({
       styleSrc:      ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
       fontSrc:       ["'self'", "fonts.gstatic.com"],
       imgSrc:        ["'self'", "data:", "https:", "lh3.googleusercontent.com"],
+      mediaSrc:      ["'self'", "data:"],
       connectSrc:    ["'self'"],
     },
   },
